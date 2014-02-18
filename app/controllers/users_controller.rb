@@ -11,6 +11,7 @@ class UsersController < ApplicationController
     #@user = User.new(email: user_params[:name], name: "jobob", password: user_params[:password], password_confirmation: user_params[:password_confirmation])
     if @user.save
       # Handle a successful save.
+      sign_in @user
       flash[:success] = "¡Savor your New Hotness!"
       redirect_to @user
     else
