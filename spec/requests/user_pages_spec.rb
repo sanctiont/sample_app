@@ -101,7 +101,7 @@ describe "User pages" do
         fill_in "Name",         with: "Example User"
         fill_in "Email",        with: "user@example.com"
         fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
 
       it "should create a user" do
@@ -119,11 +119,43 @@ describe "User pages" do
     end
    end
 
+   describe "signup as signed in users" do
+    let(:user) { FactoryGirl.create(:user) }
+
+    before do 
+     sign_in user
+     visit signup_path 
+    end
+    it { should_not have_title('Sign up') }
+   end
+
+  describe "using a 'create' action" do
+    let(:user) { FactoryGirl.create(:user) }
+    
+    before do
+      sign_in user, no_capybara: true
+      post users_path(user)
+    end 
+    specify { response.should redirect_to(root_path) }
+  end   
+
   describe "edit" do
     let(:user) { FactoryGirl.create(:user) }
     before do
       sign_in user
       visit edit_user_path(user)
+    end
+
+    describe "forbidden attributes" do
+      let(:params) do
+        { user: { admin: true, password: user.password,
+        password_confirmation: user.password } }
+      end
+      before { 
+        sign_in user, no_capybara: true
+        patch user_path(user), params 
+        }
+      specify { expect(user.reload).not_to be_admin }
     end
 
     describe "page" do

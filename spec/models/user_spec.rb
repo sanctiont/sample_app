@@ -104,4 +104,6 @@ describe "when password is not present" do
     before { @user.save }
     its(:remember_token) { should_not be_blank }
   end
+
+
 end
