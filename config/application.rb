@@ -25,6 +25,8 @@ module SampleApp
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
         config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+        #config.active_record.whitelist_attributes = true
+        #config.active_record.mass_assignment_sanitizer = :strict
 
   end
 end

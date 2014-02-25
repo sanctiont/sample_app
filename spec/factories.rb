@@ -9,4 +9,9 @@ FactoryGirl.define do
       admin true
     end
   end
+
+factory :tweet do
+    content "Lorem ipsum"
+    user
+  end
 end

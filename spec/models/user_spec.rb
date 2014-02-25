@@ -17,6 +17,9 @@ describe User do
   it { should respond_to(:remember_token) }
 
   it { should respond_to(:authenticate) }
+  it { should respond_to(:tweets) }
+  it { should respond_to(:feed) }
+
   it { should respond_to(:admin) }
 
   it { should be_valid }
@@ -106,4 +109,39 @@ describe "when password is not present" do
   end
 
 
+describe "tweet associations" do
+
+    before { @user.save }
+    let!(:older_tweet) do 
+      FactoryGirl.create(:tweet, user: @user, created_at: 1.day.ago)
+    end
+    let!(:newer_tweet) do
+      FactoryGirl.create(:tweet, user: @user, created_at: 1.hour.ago)
+    end
+
+    it "should have the right tweets in the right order" do
+      @user.tweets.should == [newer_tweet, older_tweet]
+    end
+
+    it "should destroy associated tweets" do
+      expect { @user.destroy }.to change(Tweet, :count).by(-2)
+      #tweets = @user.tweets.dup
+      #tweets.count.should be 2
+      #@user.destroy
+      #tweets.count.should be 2
+      #tweets.should_not be_empty
+      #tweets.each do |tweet|
+       # Tweet.find_by_id(tweet.id).should be_nil
+      #end
+    end
+    describe "status" do
+      let(:unfollowed_post) do
+        FactoryGirl.create(:tweet, user: FactoryGirl.create(:user))
+      end
+
+      its(:feed) { should include(newer_tweet) }
+      its(:feed) { should include(older_tweet) }
+      its(:feed) { should_not include(unfollowed_post) }
+    end
+  end
 end

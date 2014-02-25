@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
 	#before_save { self.email = email.downcase }
+	#attr_accessible :name, :email, :password, :password_confirmation
 	before_save { email.downcase! }
 	before_create :create_remember_token
 	validates :name, presence: true, length: { maximum: 50 }
@@ -7,6 +8,7 @@ class User < ActiveRecord::Base
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 	validates :email, presence: true, format: {with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
 	has_secure_password
+	has_many :tweets, dependent: :destroy
 	validates :password, length: { minimum: 6 }
 	
 
@@ -16,6 +18,11 @@ class User < ActiveRecord::Base
 
   def User.encrypt(token)
     Digest::SHA1.hexdigest(token.to_s)
+  end
+
+  def feed
+    # This is preliminary. See "Following users" for the full implementation.
+    Tweet.where("user_id = ?", id)
   end
 
 private
