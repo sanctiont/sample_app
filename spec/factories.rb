@@ -11,7 +11,7 @@ FactoryGirl.define do
   end
 
 factory :tweet do
-    content "Lorem ipsum"
+    sequence(:content) { |n| "Lorem ipsum #{n}" }
     user
   end
 end

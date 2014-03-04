@@ -73,6 +73,8 @@ describe "User pages" do
 
   	it { should have_content(user.name) }
   	it { should have_title(user.name) }
+    it { should_not have_selector('div.pagination') }
+
 
     describe "tweets" do
       it { should have_content(m1.content) }
@@ -80,6 +82,58 @@ describe "User pages" do
       it { should have_content(user.tweets.count) }
     end
   end
+
+#new
+describe "no delete links for other's tweets" do
+  let(:user) { FactoryGirl.create(:user)}
+  let(:usery) { FactoryGirl.create(:user, email: "ben@m.com")}
+  let!(:mx) {FactoryGirl.create(:tweet, user: user, content: "shouldn't find")}
+  let!(:my)  {FactoryGirl.create(:tweet, user: usery, content: "no delete me!")}
+
+
+  before do 
+    sign_in user
+    visit user_path(usery)
+  end
+
+  it { should have_content(usery.name) }
+  it { should have_title(usery.name) }
+  it { should_not have_selector('div.pagination') }
+  it { should have_content(my.content)}
+  it { should_not have_content(mx.content)}
+  it { should_not have_link('delete')}
+
+
+end
+
+
+ describe "profile page w pagination" do
+    # Replace with code to make a user variable
+    let(:user) { FactoryGirl.create(:user) }
+    
+
+    before do
+      visit user_path(user) 
+    end
+
+    before(:all) do 
+        31.times { FactoryGirl.create(:tweet, user: user) } 
+      end
+    after(:all)  { Tweet.delete_all }
+
+
+    it { should have_content(user.name) }
+    it { should have_title(user.name) }
+    it { should have_selector('div.pagination') }
+
+
+    describe "tweets" do
+      it { should have_content(user.tweets.count) }
+    end
+  end
+
+
+
 
   describe "signup" do
 
